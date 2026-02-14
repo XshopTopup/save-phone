@@ -1,4 +1,5 @@
 require('dotenv').config();
+const path = require('path');
 const express = require('express');
 const app = express();
 const { saveFormattedPhone, client } = require('./phoneHelper'); 
@@ -25,6 +26,10 @@ const initDb = async () => {
 initDb();
 
 app.use(express.static('public')); 
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 app.get('/api/get-phones', async (req, res) => {
     try {

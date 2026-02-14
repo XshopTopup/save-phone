@@ -7,7 +7,7 @@ const { saveFormattedPhone, client } = require('./phoneHelper');
 app.use(express.json());
 
 const initDb = async () => {
-    try {
+    try {/*
         await client.execute({
     sql: `INSERT INTO users (id, phone_number, country_info) 
           VALUES (?, ?, ?)
@@ -16,7 +16,18 @@ const initDb = async () => {
           country_info = excluded.country_info,
           updated_at = CURRENT_TIMESTAMP`,
     args: [userId, formatted, countryName],
+});*/
+            // Perbaikan pada phoneHelper.js
+await client.execute({
+    sql: `INSERT INTO users (id, phone_number, country_info) 
+          VALUES (?, ?, ?)
+          ON CONFLICT(id) DO UPDATE SET 
+          phone_number = excluded.phone_number, 
+          country_info = excluded.country_info,
+          updated_at = CURRENT_TIMESTAMP`,
+    args: [userId, formatted, countryName],
 });
+        
         console.log("✅ Database Turso siap (Tabel 'users' tersedia)");
     } catch (error) {
         console.error("❌ Gagal inisialisasi tabel:", error.message);

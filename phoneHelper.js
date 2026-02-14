@@ -1,3 +1,11 @@
+const { phone: phoneModule } = require('phone');
+const { createClient } = require('@libsql/client');
+
+const client = createClient({
+    url: process.env.TURSO_DATABASE_URL,
+    authToken: process.env.TURSO_AUTH_TOKEN,
+});
+
 const saveFormattedPhone = async (userId, inputNomor, inputNegara = '') => {
     try {
         const phone = typeof phoneModule === 'function' ? phoneModule : require('phone').phone;
@@ -7,7 +15,6 @@ const saveFormattedPhone = async (userId, inputNomor, inputNegara = '') => {
             const formatted = result.phoneNumber;
             const countryName = result.countryIso3;
 
-            // Arsyilla AI: Menggunakan UPSERT (Insert if not exists, Update if exists)
             await client.execute({
                 sql: `INSERT INTO users (id, phone_number, country_info) 
                       VALUES (?, ?, ?)
@@ -18,10 +25,16 @@ const saveFormattedPhone = async (userId, inputNomor, inputNegara = '') => {
                 args: [userId, formatted, countryName],
             });
 
-            return { status: "success", data: { formatted, country: countryName } };
+            return { status: "success", formatted, country: countryName };
         }
         return { status: "fail", message: "Nomor tidak valid" };
     } catch (error) {
-        return { status: "error", message: error.message };
+        throw error; // Biarkan ditangkap oleh catch di index.js
     }
+};
+
+// Arsyilla AI: Pastikan export seperti ini agar bisa di-destructure di index.js
+module.exports = { 
+    client, 
+    saveFormattedPhone 
 };

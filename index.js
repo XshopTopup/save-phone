@@ -5,6 +5,23 @@ const app = express();
 const { saveFormattedPhone, client } = require('./phoneHelper'); 
 
 app.use(express.json());
+app.get('/api/get-phones', async (req, res) => {
+    try {
+        console.log("Fetching phones from Turso...");
+        const result = await client.execute("SELECT * FROM users ORDER BY updated_at DESC");
+        
+        return res.status(200).json({
+            status: "success",
+            data: result.rows
+        });
+    } catch (error) {
+        console.error("GET Error:", error.message);
+        return res.status(500).json({
+            status: "error",
+            message: error.message
+        });
+    }
+});
 app.use(express.static('public')); 
 
 // Perbaikan initDb: Hanya untuk membuat tabel

@@ -53,7 +53,7 @@ app.post('/api/sphone.php', async (req, res) => {
         res.status(500).json({ status: "error", message: "Terjadi kesalahan pada server" });
     }
 });
-*/
+
 // Arsyilla AI - Updated Endpoint for Vercel & Turso Stability
 app.post('/api/sphone.php', async (req, res) => {
     try {
@@ -105,7 +105,53 @@ app.post('/api/sphone.php', async (req, res) => {
             detail: process.env.NODE_ENV === 'development' ? error.message : undefined 
         });
     }
+});*/
+
+// Pastikan path filenya benar
+//const { saveFormattedPhone, client } = require('./phoneHelper'); 
+
+app.post('/api/sphone.php', async (req, res) => {
+    try {
+        const { userId, nomor, negara } = req.body;
+        
+        if (!userId || !nomor) {
+            return res.status(400).json({ status: "fail", message: "userId dan nomor harus diisi" });
+        }
+
+        // Cek apakah client tersedia sebelum eksekusi
+        if (!client) {
+            throw new Error("Database client is not initialized");
+        }
+
+        // Pastikan tabel ada
+        await client.execute(`
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY, 
+                phone_number TEXT, 
+                country_info TEXT, 
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            );
+        `);
+
+        // Panggil fungsi helper
+        const result = await saveFormattedPhone(userId, nomor, negara || '');
+
+        if (result.status === "success") {
+            return res.status(200).json(result);
+        } else {
+            return res.status(400).json(result);
+        }
+
+    } catch (error) {
+        console.error("Full Endpoint Error:", error);
+        return res.status(500).json({ 
+            status: "error", 
+            message: "Terjadi kesalahan pada server",
+            error_detail: error.message // Ini akan membantu kamu melihat detail di response
+        });
+    }
 });
+                      
                 
 // Khusus Vercel: Listen hanya jika tidak dijalankan sebagai serverless function
 if (process.env.NODE_ENV !== 'production') {

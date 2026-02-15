@@ -12,44 +12,6 @@ const client = createClient({
   authToken: process.env.TURSO_AUTH_TOKEN,
 });
 
-// Fungsi untuk menyimpan nomor telepon yang sudah diformat
-const saveFormattedPhone = async (userId, inputNomor, inputNegara = '') => {
-  try {
-    const phone = typeof phoneModule === 'function' ? phoneModule : require('phone').phone;
-    const result = phone(inputNomor, { country: inputNegara || undefined });
-    
-    if (result.isValid) {
-      const formatted = result.phoneNumber;
-      const countryName = result.countryIso3;
-      
-      await client.execute({
-        sql: `INSERT INTO users (id, phone_number, country_info) 
-              VALUES (?, ?, ?) 
-              ON CONFLICT(id) DO UPDATE SET 
-                phone_number = excluded.phone_number, 
-                country_info = excluded.country_info, 
-                updated_at = CURRENT_TIMESTAMP`,
-        args: [userId, formatted, countryName],
-      });
-      
-      return { 
-        status: "success", 
-        formatted, 
-        country: countryName,
-        message: "Nomor berhasil disimpan"
-      };
-    }
-    
-    return { 
-      status: "fail", 
-      message: "Nomor tidak valid" 
-    };
-  } catch (error) {
-    console.error("Error di saveFormattedPhone:", error);
-    throw error;
-  }
-};
-
 // Middleware
 app.use(express.json());
 app.use(express.static('public'));
@@ -59,8 +21,8 @@ const initDb = async () => {
   try {
     await client.execute(`
       CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY,
-        phone_number TEXT NOT NULL,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        phone_number TEXT NOT NULL UNIQUE,
         country_info TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -81,25 +43,57 @@ app.get('/', (req, res) => {
 
 // ============= CRUD ENDPOINTS =============
 
-// CREATE - Simpan nomor telepon baru
+// CREATE - Simpan nomor telepon baru (tanpa userId dari user)
 app.post('/api/phones', async (req, res) => {
   try {
-    const { userId, nomor, negara } = req.body;
+    const { nomor, negara } = req.body;
     
-    if (!userId || !nomor) {
+    if (!nomor) {
       return res.status(400).json({ 
         status: "fail", 
-        message: "userId dan nomor harus diisi" 
+        message: "Nomor telepon harus diisi" 
       });
     }
 
-    const result = await saveFormattedPhone(userId, nomor, negara || '');
+    // Validasi nomor telepon
+    const phone = typeof phoneModule === 'function' ? phoneModule : require('phone').phone;
+    const result = phone(nomor, { country: negara || undefined });
     
-    if (result.status === "success") {
-      return res.status(201).json(result);
-    } else {
-      return res.status(400).json(result);
+    if (!result.isValid) {
+      return res.status(400).json({ 
+        status: "fail", 
+        message: "Nomor tidak valid" 
+      });
     }
+
+    // Cek apakah nomor sudah ada
+    const checkResult = await client.execute({
+      sql: "SELECT * FROM users WHERE phone_number = ?",
+      args: [result.phoneNumber]
+    });
+
+    if (checkResult.rows.length > 0) {
+      return res.status(400).json({ 
+        status: "fail", 
+        message: "Nomor telepon sudah terdaftar" 
+      });
+    }
+
+    // Simpan ke database (ID auto increment)
+    const insertResult = await client.execute({
+      sql: `INSERT INTO users (phone_number, country_info) VALUES (?, ?)`,
+      args: [result.phoneNumber, result.countryIso3]
+    });
+    
+    return res.status(201).json({
+      status: "success",
+      message: "Nomor berhasil ditambahkan",
+      data: {
+        id: insertResult.lastInsertRowid,
+        phone_number: result.phoneNumber,
+        country_info: result.countryIso3
+      }
+    });
   } catch (error) {
     console.error("Error di POST /api/phones:", error);
     return res.status(500).json({ 
@@ -190,16 +184,16 @@ app.get('/api/phones/:id', async (req, res) => {
   }
 });
 
-// UPDATE - Update nomor telepon
+// UPDATE - Update negara saja (nomor tidak bisa diubah)
 app.put('/api/phones/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { nomor, negara } = req.body;
+    const { negara } = req.body;
     
-    if (!nomor) {
+    if (!negara) {
       return res.status(400).json({ 
         status: "fail", 
-        message: "Nomor harus diisi" 
+        message: "Kode negara harus diisi" 
       });
     }
     
@@ -216,23 +210,12 @@ app.put('/api/phones/:id', async (req, res) => {
       });
     }
     
-    // Validasi nomor baru
-    const phone = typeof phoneModule === 'function' ? phoneModule : require('phone').phone;
-    const result = phone(nomor, { country: negara || undefined });
-    
-    if (!result.isValid) {
-      return res.status(400).json({ 
-        status: "fail", 
-        message: "Nomor tidak valid" 
-      });
-    }
-    
-    // Update data
+    // Update hanya country_info
     await client.execute({
       sql: `UPDATE users 
-            SET phone_number = ?, country_info = ?, updated_at = CURRENT_TIMESTAMP 
+            SET country_info = ?, updated_at = CURRENT_TIMESTAMP 
             WHERE id = ?`,
-      args: [result.phoneNumber, result.countryIso3, id]
+      args: [negara, id]
     });
     
     return res.status(200).json({ 
@@ -240,8 +223,7 @@ app.put('/api/phones/:id', async (req, res) => {
       message: "Data berhasil diupdate",
       data: {
         id: id,
-        phone_number: result.phoneNumber,
-        country_info: result.countryIso3
+        country_info: negara
       }
     });
   } catch (error) {
@@ -338,6 +320,9 @@ app.get('/api/stats', async (req, res) => {
 
 // Backward compatibility dengan endpoint lama
 app.post('/api/sphone.php', async (req, res) => {
+  // Redirect ke endpoint baru tanpa userId
+  const { nomor, negara } = req.body;
+  req.body = { nomor, negara };
   req.url = '/api/phones';
   app.handle(req, res);
 });
@@ -355,8 +340,8 @@ if (process.env.NODE_ENV !== 'production') {
     console.log(`📊 Database API tersedia di:`);
     console.log(`   - GET    /api/phones       - Ambil semua data`);
     console.log(`   - GET    /api/phones/:id   - Ambil data by ID`);
-    console.log(`   - POST   /api/phones       - Tambah data baru`);
-    console.log(`   - PUT    /api/phones/:id   - Update data`);
+    console.log(`   - POST   /api/phones       - Tambah data baru (ID otomatis)`);
+    console.log(`   - PUT    /api/phones/:id   - Update negara saja`);
     console.log(`   - DELETE /api/phones/:id   - Hapus data`);
     console.log(`   - DELETE /api/phones       - Hapus semua data`);
     console.log(`   - GET    /api/stats        - Statistik database`);

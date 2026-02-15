@@ -14,6 +14,7 @@
             --text-main: #0f172a;
             --text-muted: #64748b;
             --border: #e2e8f0;
+            --whatsapp: #25d366;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -33,7 +34,6 @@
             margin: 0 auto; 
         }
 
-        /* Header Section - Fix Overlap */
         .page-header {
             margin-bottom: 30px;
             text-align: left;
@@ -51,7 +51,6 @@
         
         .page-title p { color: var(--text-muted); font-size: 0.9rem; }
 
-        /* Stats - Mobile Responsive */
         .stats-container {
             display: flex;
             gap: 10px;
@@ -70,7 +69,6 @@
         .stat-card span { color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; font-weight: 700; display: block; }
         .stat-card b { color: var(--primary-dark); font-size: 1.2rem; }
 
-        /* Action Bar - Improved Mobile Layout */
         .action-bar { 
             display: flex;
             flex-direction: column;
@@ -121,7 +119,6 @@
         
         .btn:active { transform: scale(0.98); }
 
-        /* Table Container - Fix Cut-off */
         .table-container { 
             background: white;
             border: 1px solid var(--border);
@@ -146,11 +143,22 @@
         
         td { padding: 18px 20px; border-bottom: 1px solid #f1f5f9; }
 
+        /* Style khusus untuk link WhatsApp */
+        .whatsapp-link {
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s ease;
+        }
+
         .phone-cell { 
             font-family: 'JetBrains Mono', monospace; 
             font-weight: 700; 
             color: #0f172a; 
             font-size: 1rem;
+        }
+
+        .whatsapp-link:hover .phone-cell {
+            color: var(--whatsapp);
         }
 
         .ref-cell { color: #cbd5e1; font-weight: 700; font-size: 0.75rem; }
@@ -167,7 +175,6 @@
             gap: 5px;
         }
 
-        /* Status Dot Animation */
         .status-dot {
             height: 10px;
             width: 10px;
@@ -188,7 +195,6 @@
         .alert { padding: 12px; border-radius: 12px; margin-bottom: 15px; display: none; text-align: center; font-size: 0.85rem; font-weight: 600; }
         .alert-error { background: #fff1f2; color: var(--danger); border: 1px solid #ffe4e6; }
 
-        /* Desktop Adjustments */
         @media (min-width: 640px) {
             .action-bar { flex-direction: row; }
             .btn { width: auto; padding: 0 30px; }
@@ -253,15 +259,24 @@
                 const result = await response.json();
                 const tbody = document.getElementById('dataTable');
                 if (result.data && result.data.length > 0) {
-                    tbody.innerHTML = result.data.map(item => `
-                        <tr>
-                            <td class="ref-cell">ID-${item.id}</td>
-                            <td class="phone-cell">${item.phone_number}</td>
-                            <td style="text-align: right;">
-                                <span class="badge-country">📍 ${item.country_info || 'UNK'}</span>
-                            </td>
-                        </tr>
-                    `).join('');
+                    tbody.innerHTML = result.data.map(item => {
+                        // Membersihkan nomor dari karakter non-digit untuk URL WA
+                        const cleanNumber = item.phone_number.replace(/\D/g, '');
+                        
+                        return `
+                            <tr>
+                                <td class="ref-cell">ID-${item.id}</td>
+                                <td>
+                                    <a href="https://wa.me/${cleanNumber}" target="_blank" class="whatsapp-link">
+                                        <span class="phone-cell">${item.phone_number}</span>
+                                    </a>
+                                </td>
+                                <td style="text-align: right;">
+                                    <span class="badge-country">📍 ${item.country_info || 'UNK'}</span>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
                 } else {
                     tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding: 40px; color: #94a3b8;">Database Clear</td></tr>`;
                 }

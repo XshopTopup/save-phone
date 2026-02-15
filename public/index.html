@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phone Database Manager</title>
+    <title>Phone List Viewer</title>
     <style>
         * {
             margin: 0;
@@ -19,7 +19,7 @@
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
             background: white;
             border-radius: 15px;
@@ -35,352 +35,171 @@
         }
         
         .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-        
-        .stats {
-            display: flex;
-            justify-content: space-around;
-            background: #f8f9fa;
-            padding: 20px;
-            border-bottom: 2px solid #e9ecef;
-        }
-        
-        .stat-card {
-            text-align: center;
-            padding: 15px;
-        }
-        
-        .stat-card h3 {
-            color: #667eea;
             font-size: 2em;
             margin-bottom: 5px;
         }
-        
-        .stat-card p {
-            color: #6c757d;
+
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-bottom: 2px solid #e9ecef;
             font-size: 0.9em;
+            color: #6c757d;
+        }
+
+        .stats-bar span b {
+            color: #667eea;
         }
         
         .content {
-            padding: 30px;
-        }
-        
-        .form-section {
-            background: #f8f9fa;
             padding: 25px;
-            border-radius: 10px;
-            margin-bottom: 30px;
         }
         
-        .form-section h2 {
-            color: #333;
-            margin-bottom: 20px;
-        }
-        
-        .form-grid {
+        .action-bar {
             display: grid;
-            grid-template-columns: 2fr 1fr auto;
-            gap: 15px;
-            align-items: end;
+            grid-template-columns: 1fr auto auto;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
         }
         
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .form-group label {
-            margin-bottom: 8px;
-            color: #495057;
-            font-weight: 500;
-        }
-        
-        .form-group input, .form-group select {
-            padding: 12px;
+        .search-input {
+            width: 100%;
+            padding: 12px 20px;
             border: 2px solid #dee2e6;
-            border-radius: 8px;
+            border-radius: 50px;
             font-size: 14px;
-            transition: border-color 0.3s;
+            transition: all 0.3s;
         }
         
-        .form-group input:focus, .form-group select:focus {
+        .search-input:focus {
             outline: none;
             border-color: #667eea;
+            box-shadow: 0 0 8px rgba(102, 126, 234, 0.2);
         }
         
         .btn {
-            padding: 12px 25px;
+            padding: 10px 20px;
             border: none;
-            border-radius: 8px;
+            border-radius: 50px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        .btn-refresh {
+            background: #eef2ff;
+            color: #4338ca;
         }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
+
+        .btn-refresh:hover { background: #e0e7ff; }
         
         .btn-danger {
-            background: #dc3545;
-            color: white;
+            background: #fee2e2;
+            color: #b91c1c;
         }
-        
-        .btn-danger:hover {
-            background: #c82333;
-        }
-        
-        .btn-warning {
-            background: #ffc107;
-            color: #000;
-        }
-        
-        .btn-warning:hover {
-            background: #e0a800;
-        }
-        
-        .btn-small {
+
+        .btn-danger:hover { background: #fecaca; }
+
+        .btn-edit {
+            background: #fef3c7;
+            color: #92400e;
             padding: 6px 12px;
+            border-radius: 4px;
             font-size: 12px;
-            margin: 0 3px;
-        }
-        
-        .search-box {
-            margin-bottom: 20px;
-        }
-        
-        .search-box input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #dee2e6;
-            border-radius: 8px;
-            font-size: 14px;
         }
         
         .table-container {
             overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
         }
         
         table {
             width: 100%;
             border-collapse: collapse;
             background: white;
-        }
-        
-        thead {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            font-size: 14px;
         }
         
         th {
+            background: #f8f9fa;
             padding: 15px;
             text-align: left;
+            color: #4b5563;
             font-weight: 600;
+            border-bottom: 2px solid #e9ecef;
         }
         
         td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #dee2e6;
+            padding: 15px;
+            border-bottom: 1px solid #f3f4f6;
+            color: #1f2937;
         }
         
         tbody tr:hover {
-            background: #f8f9fa;
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 50px;
-            color: #6c757d;
-        }
-        
-        .empty-state svg {
-            width: 100px;
-            height: 100px;
-            margin-bottom: 20px;
-            opacity: 0.3;
-        }
-        
-        .alert {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-        }
-        
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+            background: #f9fafb;
         }
         
         .badge {
             display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
         }
         
         .badge-country {
-            background: #e7f3ff;
-            color: #0066cc;
+            background: #ecfdf5;
+            color: #059669;
         }
 
-        .modal {
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
             display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-        }
-
-        .modal-content {
-            background-color: white;
-            margin: 10% auto;
-            padding: 30px;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-
-        .modal-header {
-            margin-bottom: 20px;
-        }
-
-        .modal-header h2 {
-            color: #333;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-top: 20px;
-        }
-
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #5a6268;
-        }
-        
-        @media (max-width: 768px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .stats {
-                flex-direction: column;
-            }
-            
-            .stat-card {
-                margin-bottom: 15px;
-            }
-        }
-        
-        .info-box {
-            background: #e7f3ff;
-            border-left: 4px solid #0066cc;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-        }
-        
-        .info-box p {
-            color: #004085;
-            margin: 5px 0;
+            text-align: center;
             font-size: 14px;
+        }
+        
+        .alert-success { background: #d1fae5; color: #065f46; }
+        .alert-error { background: #fee2e2; color: #991b1b; }
+
+        @media (max-width: 600px) {
+            .action-bar { grid-template-columns: 1fr; }
+            .stats-bar { flex-direction: column; gap: 5px; text-align: center; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>📱 Phone Database Manager</h1>
-            <p>Kelola database nomor telepon dengan mudah</p>
+            <h1>📋 Daftar Nomor Telepon</h1>
+            <p>Manajemen data nomor yang tersimpan di database</p>
         </div>
-        
-        <div class="stats">
-            <div class="stat-card">
-                <h3 id="totalRecords">0</h3>
-                <p>Total Records</p>
-            </div>
-            <div class="stat-card">
-                <h3 id="totalCountries">0</h3>
-                <p>Countries</p>
-            </div>
-            <div class="stat-card">
-                <h3 id="lastUpdate">-</h3>
-                <p>Last Update</p>
-            </div>
+
+        <div class="stats-bar">
+            <span>Total Record: <b id="totalRecords">0</b></span>
+            <span>Negara Terdeteksi: <b id="totalCountries">0</b></span>
+            <span>Update Terakhir: <b id="lastUpdate">-</b></span>
         </div>
         
         <div class="content">
             <div class="alert alert-success" id="successAlert"></div>
             <div class="alert alert-error" id="errorAlert"></div>
             
-            <div class="form-section">
-                <h2>➕ Tambah Nomor Telepon Baru</h2>
-                <div class="info-box">
-                    <p>ℹ️ <strong>ID akan dibuat otomatis</strong> oleh sistem</p>
-                    <p>ℹ️ <strong>Nomor telepon tidak dapat diubah</strong> setelah disimpan</p>
-                    <p>ℹ️ Jika ingin mengubah nomor, hapus data lama dan tambahkan yang baru</p>
-                </div>
-                <form id="phoneForm">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="nomor">Nomor Telepon *</label>
-                            <input type="text" id="nomor" placeholder="Contoh: 08123456789 atau +628123456789" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="negara">Kode Negara</label>
-                            <select id="negara">
-                                <option value="">Auto Detect</option>
-                                <option value="ID">Indonesia (ID)</option>
-                                <option value="US">United States (US)</option>
-                                <option value="GB">United Kingdom (GB)</option>
-                                <option value="SG">Singapore (SG)</option>
-                                <option value="MY">Malaysia (MY)</option>
-                                <option value="AU">Australia (AU)</option>
-                                <option value="JP">Japan (JP)</option>
-                                <option value="KR">South Korea (KR)</option>
-                                <option value="CN">China (CN)</option>
-                                <option value="TH">Thailand (TH)</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary">💾 Tambah</button>
-                    </div>
-                </form>
-            </div>
-            
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="🔍 Cari nomor telepon atau negara...">
-            </div>
-            
-            <div style="margin-bottom: 15px; display: flex; justify-content: space-between;">
-                <button class="btn btn-primary" onclick="loadData()">🔄 Refresh</button>
+            <div class="action-bar">
+                <input type="text" id="searchInput" class="search-input" placeholder="🔍 Cari nomor atau kode negara...">
+                <button class="btn btn-refresh" onclick="loadData()">🔄 Refresh</button>
                 <button class="btn btn-danger" onclick="deleteAll()">🗑️ Hapus Semua</button>
             </div>
             
@@ -391,285 +210,99 @@
                             <th>ID</th>
                             <th>Nomor Telepon</th>
                             <th>Negara</th>
-                            <th>Dibuat</th>
-                            <th>Diupdate</th>
+                            <th>Terdaftar Pada</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="dataTable">
-                        <tr>
-                            <td colspan="6" class="empty-state">
-                                <div>
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                                    </svg>
-                                    <h3>Tidak ada data</h3>
-                                    <p>Tambahkan data nomor telepon pertama Anda</p>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
+                        </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- Modal Edit Negara -->
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>✏️ Edit Kode Negara</h2>
-            </div>
-            <form id="editForm">
-                <input type="hidden" id="editId">
-                <div class="form-group">
-                    <label>Nomor Telepon (tidak dapat diubah)</label>
-                    <input type="text" id="editPhone" disabled style="background: #e9ecef;">
-                </div>
-                <div class="form-group" style="margin-top: 15px;">
-                    <label for="editCountry">Kode Negara Baru *</label>
-                    <select id="editCountry" required>
-                        <option value="">Pilih Negara</option>
-                        <option value="ID">Indonesia (ID)</option>
-                        <option value="US">United States (US)</option>
-                        <option value="GB">United Kingdom (GB)</option>
-                        <option value="SG">Singapore (SG)</option>
-                        <option value="MY">Malaysia (MY)</option>
-                        <option value="AU">Australia (AU)</option>
-                        <option value="JP">Japan (JP)</option>
-                        <option value="KR">South Korea (KR)</option>
-                        <option value="CN">China (CN)</option>
-                        <option value="TH">Thailand (TH)</option>
-                    </select>
-                </div>
-                <div class="modal-buttons">
-                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Batal</button>
-                    <button type="submit" class="btn btn-primary">💾 Simpan</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <script>
-        // Load data saat halaman dibuka
         window.addEventListener('DOMContentLoaded', () => {
             loadData();
             loadStats();
         });
 
-        // Form submit - Tambah data baru
-        document.getElementById('phoneForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const nomor = document.getElementById('nomor').value;
-            const negara = document.getElementById('negara').value;
-            
-            try {
-                const response = await fetch('/api/phones', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nomor, negara })
-                });
-                
-                const result = await response.json();
-                
-                if (result.status === 'success') {
-                    showAlert('success', result.message || 'Data berhasil ditambahkan!');
-                    document.getElementById('phoneForm').reset();
-                    loadData();
-                    loadStats();
-                } else {
-                    showAlert('error', result.message || 'Gagal menambahkan data');
-                }
-            } catch (error) {
-                showAlert('error', 'Terjadi kesalahan: ' + error.message);
-            }
-        });
-
-        // Form submit - Edit negara
-        document.getElementById('editForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const id = document.getElementById('editId').value;
-            const negara = document.getElementById('editCountry').value;
-            
-            try {
-                const response = await fetch(`/api/phones/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ negara })
-                });
-                
-                const result = await response.json();
-                
-                if (result.status === 'success') {
-                    showAlert('success', 'Kode negara berhasil diupdate!');
-                    closeEditModal();
-                    loadData();
-                    loadStats();
-                } else {
-                    showAlert('error', result.message || 'Gagal mengupdate data');
-                }
-            } catch (error) {
-                showAlert('error', 'Terjadi kesalahan: ' + error.message);
-            }
-        });
-
-        // Search functionality
-        document.getElementById('searchInput').addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            const rows = document.querySelectorAll('#dataTable tr');
-            
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(searchTerm) ? '' : 'none';
-            });
-        });
-
-        // Load data dari API
         async function loadData() {
             try {
                 const response = await fetch('/api/phones');
                 const result = await response.json();
-                
                 const tbody = document.getElementById('dataTable');
                 
                 if (result.data && result.data.length > 0) {
                     tbody.innerHTML = result.data.map(item => `
                         <tr>
-                            <td><strong>#${item.id}</strong></td>
-                            <td><strong>${item.phone_number}</strong></td>
-                            <td><span class="badge badge-country">${item.country_info || '-'}</span></td>
+                            <td><span style="color:#9ca3af">#${item.id}</span></td>
+                            <td><b>${item.phone_number}</b></td>
+                            <td><span class="badge badge-country">${item.country_info || 'Unknown'}</span></td>
                             <td>${formatDate(item.created_at)}</td>
-                            <td>${formatDate(item.updated_at)}</td>
                             <td>
-                                <button class="btn btn-warning btn-small" onclick='editCountry(${JSON.stringify(item)})'>✏️ Edit Negara</button>
-                                <button class="btn btn-danger btn-small" onclick="deleteData(${item.id})">🗑️ Hapus</button>
+                                <button class="btn btn-danger" style="padding: 5px 10px; font-size: 11px;" onclick="deleteData(${item.id})">Hapus</button>
                             </td>
                         </tr>
                     `).join('');
                 } else {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="6" class="empty-state">
-                                <h3>Tidak ada data</h3>
-                                <p>Tambahkan data nomor telepon pertama Anda</p>
-                            </td>
-                        </tr>
-                    `;
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 40px; color: #9ca3af;">Tidak ada data ditemukan</td></tr>`;
                 }
             } catch (error) {
-                showAlert('error', 'Gagal memuat data: ' + error.message);
+                showAlert('error', 'Gagal memuat data');
             }
         }
 
-        // Load statistics
         async function loadStats() {
             try {
                 const response = await fetch('/api/stats');
                 const result = await response.json();
-                
                 if (result.status === 'success') {
                     document.getElementById('totalRecords').textContent = result.stats.total_records;
                     document.getElementById('totalCountries').textContent = result.stats.by_country.length;
                     document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('id-ID');
                 }
-            } catch (error) {
-                console.error('Gagal memuat statistik:', error);
-            }
+            } catch (e) {}
         }
 
-        // Edit country - Buka modal
-        function editCountry(item) {
-            document.getElementById('editId').value = item.id;
-            document.getElementById('editPhone').value = item.phone_number;
-            document.getElementById('editCountry').value = item.country_info || '';
-            document.getElementById('editModal').style.display = 'block';
-        }
-
-        // Close modal
-        function closeEditModal() {
-            document.getElementById('editModal').style.display = 'none';
-            document.getElementById('editForm').reset();
-        }
-
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('editModal');
-            if (event.target == modal) {
-                closeEditModal();
-            }
-        }
-
-        // Delete data
-        async function deleteData(id) {
-            if (!confirm('Yakin ingin menghapus data ini?\n\nPerhatian: Nomor telepon tidak dapat diubah, jadi pastikan Anda benar-benar ingin menghapus data ini.')) return;
-            
-            try {
-                const response = await fetch(`/api/phones/${id}`, {
-                    method: 'DELETE'
-                });
-                
-                const result = await response.json();
-                
-                if (result.status === 'success') {
-                    showAlert('success', 'Data berhasil dihapus!');
-                    loadData();
-                    loadStats();
-                } else {
-                    showAlert('error', result.message || 'Gagal menghapus data');
-                }
-            } catch (error) {
-                showAlert('error', 'Terjadi kesalahan: ' + error.message);
-            }
-        }
-
-        // Delete all data
-        async function deleteAll() {
-            if (!confirm('PERINGATAN: Ini akan menghapus SEMUA data!\n\nApakah Anda yakin?')) return;
-            
-            try {
-                const response = await fetch('/api/phones', {
-                    method: 'DELETE'
-                });
-                
-                const result = await response.json();
-                
-                if (result.status === 'success') {
-                    showAlert('success', 'Semua data berhasil dihapus!');
-                    loadData();
-                    loadStats();
-                } else {
-                    showAlert('error', result.message || 'Gagal menghapus data');
-                }
-            } catch (error) {
-                showAlert('error', 'Terjadi kesalahan: ' + error.message);
-            }
-        }
-
-        // Show alert
-        function showAlert(type, message) {
-            const alertId = type === 'success' ? 'successAlert' : 'errorAlert';
-            const alert = document.getElementById(alertId);
-            alert.textContent = message;
-            alert.style.display = 'block';
-            
-            setTimeout(() => {
-                alert.style.display = 'none';
-            }, 5000);
-        }
-
-        // Format date
-        function formatDate(dateString) {
-            if (!dateString) return '-';
-            const date = new Date(dateString);
-            return date.toLocaleString('id-ID', {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#dataTable tr');
+            rows.forEach(row => {
+                row.style.display = row.textContent.toLowerCase().includes(term) ? '' : 'none';
             });
+        });
+
+        async function deleteData(id) {
+            if (!confirm('Hapus nomor ini?')) return;
+            try {
+                await fetch(`/api/phones/${id}`, { method: 'DELETE' });
+                showAlert('success', 'Data dihapus');
+                loadData();
+                loadStats();
+            } catch (e) { showAlert('error', 'Gagal menghapus'); }
+        }
+
+        async function deleteAll() {
+            if (!confirm('Hapus SEMUA data? Tindakan ini permanen.')) return;
+            try {
+                await fetch('/api/phones', { method: 'DELETE' });
+                showAlert('success', 'Semua data dibersihkan');
+                loadData();
+                loadStats();
+            } catch (e) { showAlert('error', 'Gagal menghapus semua'); }
+        }
+
+        function showAlert(type, msg) {
+            const alert = document.getElementById(type === 'success' ? 'successAlert' : 'errorAlert');
+            alert.textContent = msg;
+            alert.style.display = 'block';
+            setTimeout(() => alert.style.display = 'none', 3000);
+        }
+
+        function formatDate(str) {
+            if (!str) return '-';
+            return new Date(str).toLocaleDateString('id-ID', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
         }
     </script>
 </body>

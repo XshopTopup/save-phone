@@ -4,225 +4,196 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ripper Database - Professional Monitoring</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #6366f1;
             --primary-dark: #4f46e5;
             --danger: #f43f5e;
-            --bg-body: #fdfeff;
+            --bg-body: #f8fafc;
             --text-main: #0f172a;
             --text-muted: #64748b;
-            --border: #f1f5f9;
-            --glass: rgba(255, 255, 255, 0.8);
+            --border: #e2e8f0;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body { 
-            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; 
+            font-family: 'Inter', sans-serif; 
             background-color: var(--bg-body);
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.05) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(244, 63, 94, 0.03) 0px, transparent 50%);
+            background-image: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.03) 0px, transparent 50%);
             color: var(--text-main);
-            padding: 60px 20px; 
-            line-height: 1.6;
+            padding: 20px; 
+            line-height: 1.5;
             min-height: 100vh;
         }
 
         .main-wrapper { 
-            max-width: 1000px; 
+            max-width: 800px; 
             margin: 0 auto; 
         }
 
-        /* Header Section */
+        /* Header Section - Fix Overlap */
         .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
+            text-align: left;
         }
 
         .page-title h1 { 
-            font-size: 2rem; 
+            font-size: 1.75rem; 
             font-weight: 800;
-            color: #1e293b;
             display: flex;
             align-items: center;
-            gap: 15px;
-            letter-spacing: -0.04em;
+            gap: 12px;
+            letter-spacing: -0.03em;
+            margin-bottom: 8px;
         }
         
-        .page-title p { 
-            color: var(--text-muted); 
-            font-size: 1rem;
-            margin-top: 6px;
-        }
+        .page-title p { color: var(--text-muted); font-size: 0.9rem; }
 
-        /* Stats Badge Style */
+        /* Stats - Mobile Responsive */
         .stats-container {
             display: flex;
-            gap: 12px;
+            gap: 10px;
+            margin-top: 20px;
         }
 
         .stat-card {
+            flex: 1;
             background: white;
-            padding: 10px 20px;
-            border-radius: 14px;
+            padding: 12px;
+            border-radius: 16px;
             border: 1px solid var(--border);
-            font-size: 0.85rem;
-            font-weight: 600;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
 
-        .stat-card span { color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
-        .stat-card b { color: var(--primary-dark); font-size: 1.25rem; }
+        .stat-card span { color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; font-weight: 700; display: block; }
+        .stat-card b { color: var(--primary-dark); font-size: 1.2rem; }
 
-        /* Action Bar */
+        /* Action Bar - Improved Mobile Layout */
         .action-bar { 
-            display: grid; 
-            grid-template-columns: 1fr auto; 
-            gap: 15px; 
+            display: flex;
+            flex-direction: column;
+            gap: 12px; 
             margin-bottom: 25px; 
+            margin-top: 25px;
         }
 
         .search-wrapper { position: relative; width: 100%; }
         
         .search-input { 
             width: 100%; 
-            padding: 14px 16px 14px 48px; 
+            padding: 14px 16px 14px 44px; 
             border: 1px solid var(--border); 
-            border-radius: 16px; 
-            font-size: 0.95rem; 
+            border-radius: 14px; 
+            font-size: 0.9rem; 
             background: white;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            transition: all 0.3s;
         }
 
         .search-wrapper::before {
             content: '🔍';
             position: absolute;
-            left: 18px;
+            left: 16px;
             top: 50%;
             transform: translateY(-50%);
             font-size: 14px;
-            filter: grayscale(1);
-            opacity: 0.4;
+            opacity: 0.5;
         }
 
-        .search-input:focus { 
-            outline: none; 
-            border-color: var(--primary); 
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.08), 0 10px 15px -3px rgba(0,0,0,0.05);
-            background: #fff;
-        }
+        .search-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.05); }
 
         .btn { 
-            padding: 0 28px; 
-            height: 52px;
-            background: var(--text-main);
+            width: 100%;
+            height: 50px;
+            background: #0f172a;
             color: white;
             border: none;
-            border-radius: 16px; 
+            border-radius: 14px; 
             font-size: 0.95rem; 
-            font-weight: 600; 
+            font-weight: 700; 
             cursor: pointer; 
-            transition: all 0.2s; 
             display: flex; 
             align-items: center; 
-            gap: 10px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            justify-content: center;
+            gap: 8px; 
         }
         
-        .btn:hover { background: #000; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
-        .btn:active { transform: translateY(0); }
+        .btn:active { transform: scale(0.98); }
 
-        /* Table Design */
+        /* Table Container - Fix Cut-off */
         .table-container { 
             background: white;
             border: 1px solid var(--border);
-            border-radius: 24px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+            border-radius: 20px;
             overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
         }
 
-        table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+        table { width: 100%; border-collapse: collapse; }
         
         th { 
-            background: #fafbff; 
-            padding: 20px; 
+            background: #f8fafc; 
+            padding: 15px 20px; 
             text-align: left; 
             color: var(--text-muted); 
             font-weight: 700; 
-            text-transform: uppercase;
             font-size: 0.7rem;
-            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
             border-bottom: 1px solid var(--border);
         }
         
-        td { padding: 20px; border-bottom: 1px solid #f8fafc; vertical-align: middle; }
-        
-        tbody tr { transition: background 0.2s; }
-        tbody tr:hover { background: #fcfdfe; }
-        tbody tr:last-child td { border-bottom: none; }
+        td { padding: 18px 20px; border-bottom: 1px solid #f1f5f9; }
 
         .phone-cell { 
             font-family: 'JetBrains Mono', monospace; 
             font-weight: 700; 
             color: #0f172a; 
-            font-size: 1.05rem;
-            letter-spacing: -0.02em;
+            font-size: 1rem;
         }
 
-        .badge { 
-            display: inline-flex; 
+        .ref-cell { color: #cbd5e1; font-weight: 700; font-size: 0.75rem; }
+
+        .badge-country { 
+            background: #f1f5f9; 
+            color: #475569; 
+            padding: 6px 12px; 
+            border-radius: 10px; 
+            font-size: 0.75rem; 
+            font-weight: 700;
+            display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 6px 14px; 
-            border-radius: 12px; 
-            font-size: 0.8rem; 
-            font-weight: 700; 
+            gap: 5px;
         }
-        
-        .badge-country { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
 
-        /* Indicator for Ripper Style */
+        /* Status Dot Animation */
         .status-dot {
             height: 10px;
             width: 10px;
             background-color: var(--danger);
             border-radius: 50%;
-            display: inline-block;
-            box-shadow: 0 0 12px var(--danger);
             position: relative;
         }
-
         .status-dot::after {
             content: '';
             position: absolute;
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             background: inherit;
             border-radius: inherit;
             animation: pulse 2s infinite;
         }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
 
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(2.5); opacity: 0; }
-        }
-
-        .alert { padding: 15px; border-radius: 16px; margin-bottom: 25px; display: none; text-align: center; font-size: 0.9rem; font-weight: 600; animation: slideDown 0.3s ease; }
+        .alert { padding: 12px; border-radius: 12px; margin-bottom: 15px; display: none; text-align: center; font-size: 0.85rem; font-weight: 600; }
         .alert-error { background: #fff1f2; color: var(--danger); border: 1px solid #ffe4e6; }
 
-        @keyframes slideDown { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-        @media (max-width: 768px) { 
-            .page-header { flex-direction: column; align-items: flex-start; gap: 20px; }
-            .action-bar { grid-template-columns: 1fr; }
-            .btn { width: 100%; justify-content: center; }
+        /* Desktop Adjustments */
+        @media (min-width: 640px) {
+            .action-bar { flex-direction: row; }
+            .btn { width: auto; padding: 0 30px; }
+            .page-header { display: flex; justify-content: space-between; align-items: center; }
+            .stats-container { margin-top: 0; }
         }
     </style>
 </head>
@@ -231,9 +202,8 @@
         <header class="page-header">
             <div class="page-title">
                 <h1><span class="status-dot"></span> Ripper Records</h1>
-                <p>Database pemantauan nomor telepon terdeteksi indikasi ripper.</p>
+                <p>Monitoring database nomor ripper.</p>
             </div>
-
             <div class="stats-container">
                 <div class="stat-card">
                     <span>Target</span>
@@ -250,7 +220,7 @@
 
         <div class="action-bar">
             <div class="search-wrapper">
-                <input type="text" id="searchInput" class="search-input" placeholder="Cari identitas nomor atau kode negara...">
+                <input type="text" id="searchInput" class="search-input" placeholder="Cari nomor atau negara...">
             </div>
             <button class="btn" onclick="loadData()">
                 <span>🔄</span> Refresh
@@ -261,13 +231,12 @@
             <table>
                 <thead>
                     <tr>
-                        <th style="width: 120px;">Reference</th>
-                        <th>Phone Identity</th>
-                        <th>Origin Info</th>
+                        <th style="width: 80px;">Ref</th>
+                        <th>Identity</th>
+                        <th style="text-align: right;">Info</th>
                     </tr>
                 </thead>
-                <tbody id="dataTable">
-                    </tbody>
+                <tbody id="dataTable"></tbody>
             </table>
         </div>
     </div>
@@ -283,21 +252,20 @@
                 const response = await fetch('/api/phones');
                 const result = await response.json();
                 const tbody = document.getElementById('dataTable');
-                
                 if (result.data && result.data.length > 0) {
                     tbody.innerHTML = result.data.map(item => `
                         <tr>
-                            <td><span style="color:#cbd5e1; font-weight: 700; font-size: 0.75rem;">ID-${item.id}</span></td>
+                            <td class="ref-cell">ID-${item.id}</td>
                             <td class="phone-cell">${item.phone_number}</td>
-                            <td><span class="badge badge-country">📍 ${item.country_info || 'Unknown'}</span></td>
+                            <td style="text-align: right;">
+                                <span class="badge-country">📍 ${item.country_info || 'UNK'}</span>
+                            </td>
                         </tr>
                     `).join('');
                 } else {
-                    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding: 60px; color: #94a3b8; font-style: italic;">Database is currently clear.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding: 40px; color: #94a3b8;">Database Clear</td></tr>`;
                 }
-            } catch (error) {
-                showAlert('Database connection lost. Please check your API endpoint.');
-            }
+            } catch (error) { showAlert('Connection Error'); }
         }
 
         async function loadStats() {
@@ -314,16 +282,14 @@
         document.getElementById('searchInput').addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
             const rows = document.querySelectorAll('#dataTable tr');
-            rows.forEach(row => {
-                row.style.display = row.textContent.toLowerCase().includes(term) ? '' : 'none';
-            });
+            rows.forEach(row => { row.style.display = row.textContent.toLowerCase().includes(term) ? '' : 'none'; });
         });
 
         function showAlert(msg) {
             const alert = document.getElementById('errorAlert');
             alert.textContent = msg;
             alert.style.display = 'block';
-            setTimeout(() => alert.style.display = 'none', 5000);
+            setTimeout(() => alert.style.display = 'none', 3000);
         }
     </script>
 </body>

@@ -3,142 +3,532 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arsyilla AI - Blacklist Database</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Phone Database Manager</title>
     <style>
-        body { 
-            background-color: #ffffff; /* Latar belakang bersih tanpa card */
-            font-family: 'Inter', sans-serif;
-            color: #0f172a;
+        * {
             margin: 0;
-            padding: 40px 20px;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .main-wrapper {
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
             max-width: 1200px;
             margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
         }
-        .page-header {
-            margin-bottom: 40px;
-            border-left: 4px solid #ef4444;
-            padding-left: 20px;
-        }
-        .page-header h1 {
-            font-weight: 700;
-            font-size: 1.75rem;
-            margin: 0;
-            color: #1e293b;
-        }
-        .page-header p {
-            color: #64748b;
-            margin: 5px 0 0 0;
-        }
-        /* Styling Table tanpa Card border */
-        .table {
-            border-collapse: separate;
-            border-spacing: 0 8px;
-        }
-        .table thead th {
-            border: none;
-            color: #94a3b8;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 15px 20px;
-        }
-        .table tbody tr {
-            background-color: #f8fafc; /* Baris memiliki warna dasar lembut */
-            transition: transform 0.2s ease, background-color 0.2s ease;
-        }
-        .table tbody tr td {
-            padding: 18px 20px;
-            border: none;
-        }
-        .table tbody tr td:first-child { border-radius: 12px 0 0 12px; }
-        .table tbody tr td:last-child { border-radius: 0 12px 12px 0; }
-
-        .table tbody tr:hover {
-            background-color: #fee2e2; /* Highlight merah saat hover */
-            transform: scale(1.005);
-        }
-        .phone-number { 
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 600; 
-            color: #dc2626;
-        }
-        .badge-status {
-            background: #ef4444;
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            font-size: 0.7rem;
-            padding: 4px 10px;
-            border-radius: 6px;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 15px;
+        }
+        
+        .stat-card h3 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+        
+        .stat-card p {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .form-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 15px;
+            align-items: end;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            margin-bottom: 8px;
+            color: #495057;
+            font-weight: 500;
+        }
+        
+        .form-group input, .form-group select {
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #000;
+        }
+        
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+            margin: 0 3px;
+        }
+        
+        .search-box {
+            margin-bottom: 20px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+        
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        th {
+            padding: 15px;
+            text-align: left;
             font-weight: 600;
         }
-        .timestamp { color: #94a3b8; font-size: 0.85rem; }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+            color: #6c757d;
+        }
+        
+        .empty-state svg {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-country {
+            background: #e7f3ff;
+            color: #0066cc;
+        }
+        
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                flex-direction: column;
+            }
+            
+            .stat-card {
+                margin-bottom: 15px;
+            }
+        }
     </style>
 </head>
 <body>
-
-<div class="main-wrapper">
-    <header class="page-header">
-        <h1>Blacklist Database</h1>
-        <p>Laporan nomor penipuan dan ripper yang teridentifikasi secara sistem.</p>
-    </header>
-
-    <div class="table-responsive">
-        <table class="table align-middle">
-            <thead>
-                <tr>
-                    <th width="100">Index</th>
-                    <th>Nomor Telepon</th>
-                    <th>Kategori</th>
-                    <th>Negara</th>
-                    <th class="text-end">Pembaruan Terakhir</th>
-                </tr>
-            </thead>
-            <tbody id="phoneTableBody">
-                <tr>
-                    <td colspan="5" class="text-center py-5 text-muted">Menghubungkan ke database...</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<script>
-    async function fetchData() {
-        try {
-            const response = await fetch('/api/get-phones');
-            const result = await response.json();
-
-            const tableBody = document.getElementById('phoneTableBody');
-            tableBody.innerHTML = '';
-
-            if (result.status === 'success' && result.data.length > 0) {
-                result.data.forEach(user => {
-                    const row = `
+    <div class="container">
+        <div class="header">
+            <h1>📱 Phone Database Manager</h1>
+            <p>Kelola database nomor telepon dengan mudah</p>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <h3 id="totalRecords">0</h3>
+                <p>Total Records</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="totalCountries">0</h3>
+                <p>Countries</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="lastUpdate">-</h3>
+                <p>Last Update</p>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="alert alert-success" id="successAlert"></div>
+            <div class="alert alert-error" id="errorAlert"></div>
+            
+            <div class="form-section">
+                <h2>➕ Tambah / Update Data</h2>
+                <form id="phoneForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="userId">User ID</label>
+                            <input type="number" id="userId" placeholder="Contoh: 1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="nomor">Nomor Telepon</label>
+                            <input type="text" id="nomor" placeholder="Contoh: 08123456789" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="negara">Kode Negara</label>
+                            <select id="negara">
+                                <option value="">Auto Detect</option>
+                                <option value="ID">Indonesia (ID)</option>
+                                <option value="US">United States (US)</option>
+                                <option value="GB">United Kingdom (GB)</option>
+                                <option value="SG">Singapore (SG)</option>
+                                <option value="MY">Malaysia (MY)</option>
+                                <option value="AU">Australia (AU)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">💾 Simpan</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Cari nomor telepon atau negara...">
+            </div>
+            
+            <div style="margin-bottom: 15px; display: flex; justify-content: space-between;">
+                <button class="btn btn-primary" onclick="loadData()">🔄 Refresh</button>
+                <button class="btn btn-danger" onclick="deleteAll()">🗑️ Hapus Semua</button>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
                         <tr>
-                            <td class="fw-medium text-secondary">#${user.id}</td>
-                            <td><span class="phone-number">${user.phone_number}</span></td>
-                            <td><span class="badge-status">SCAMMER</span></td>
-                            <td><span class="text-dark fw-medium">${user.country_info || 'Global'}</span></td>
-                            <td class="text-end timestamp">${user.updated_at || '-'}</td>
+                            <th>ID</th>
+                            <th>Nomor Telepon</th>
+                            <th>Negara</th>
+                            <th>Dibuat</th>
+                            <th>Diupdate</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTable">
+                        <tr>
+                            <td colspan="6" class="empty-state">
+                                <div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                                    </svg>
+                                    <h3>Tidak ada data</h3>
+                                    <p>Tambahkan data nomor telepon pertama Anda</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load data saat halaman dibuka
+        window.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            loadStats();
+        });
+
+        // Form submit
+        document.getElementById('phoneForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const userId = document.getElementById('userId').value;
+            const nomor = document.getElementById('nomor').value;
+            const negara = document.getElementById('negara').value;
+            
+            try {
+                const response = await fetch('/api/phones', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, nomor, negara })
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showAlert('success', result.message || 'Data berhasil disimpan!');
+                    document.getElementById('phoneForm').reset();
+                    loadData();
+                    loadStats();
+                } else {
+                    showAlert('error', result.message || 'Gagal menyimpan data');
+                }
+            } catch (error) {
+                showAlert('error', 'Terjadi kesalahan: ' + error.message);
+            }
+        });
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#dataTable tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // Load data dari API
+        async function loadData() {
+            try {
+                const response = await fetch('/api/phones');
+                const result = await response.json();
+                
+                const tbody = document.getElementById('dataTable');
+                
+                if (result.data && result.data.length > 0) {
+                    tbody.innerHTML = result.data.map(item => `
+                        <tr>
+                            <td>${item.id}</td>
+                            <td><strong>${item.phone_number}</strong></td>
+                            <td><span class="badge badge-country">${item.country_info || '-'}</span></td>
+                            <td>${formatDate(item.created_at)}</td>
+                            <td>${formatDate(item.updated_at)}</td>
+                            <td>
+                                <button class="btn btn-warning btn-small" onclick="editData(${item.id}, '${item.phone_number}', '${item.country_info}')">✏️ Edit</button>
+                                <button class="btn btn-danger btn-small" onclick="deleteData(${item.id})">🗑️ Hapus</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="empty-state">
+                                <h3>Tidak ada data</h3>
+                                <p>Tambahkan data nomor telepon pertama Anda</p>
+                            </td>
                         </tr>
                     `;
-                    tableBody.innerHTML += row;
-                });
-            } else {
-                tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-5">Database aman. Tidak ada laporan terdaftar.</td></tr>';
+                }
+            } catch (error) {
+                showAlert('error', 'Gagal memuat data: ' + error.message);
             }
-        } catch (error) {
-            console.error('Error fetching data:', error);
-            document.getElementById('phoneTableBody').innerHTML = '<tr><td colspan="5" class="text-center py-5 text-danger">Gagal sinkronisasi data server.</td></tr>';
         }
-    }
 
-    // Eksekusi data
-    fetchData();
-</script>
+        // Load statistics
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    document.getElementById('totalRecords').textContent = result.stats.total_records;
+                    document.getElementById('totalCountries').textContent = result.stats.by_country.length;
+                    document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('id-ID');
+                }
+            } catch (error) {
+                console.error('Gagal memuat statistik:', error);
+            }
+        }
 
+        // Edit data
+        function editData(id, phone, country) {
+            document.getElementById('userId').value = id;
+            document.getElementById('nomor').value = phone;
+            document.getElementById('negara').value = country;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Delete data
+        async function deleteData(id) {
+            if (!confirm('Yakin ingin menghapus data ini?')) return;
+            
+            try {
+                const response = await fetch(`/api/phones/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showAlert('success', 'Data berhasil dihapus!');
+                    loadData();
+                    loadStats();
+                } else {
+                    showAlert('error', result.message || 'Gagal menghapus data');
+                }
+            } catch (error) {
+                showAlert('error', 'Terjadi kesalahan: ' + error.message);
+            }
+        }
+
+        // Delete all data
+        async function deleteAll() {
+            if (!confirm('PERINGATAN: Ini akan menghapus SEMUA data!\n\nApakah Anda yakin?')) return;
+            
+            try {
+                const response = await fetch('/api/phones', {
+                    method: 'DELETE'
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showAlert('success', 'Semua data berhasil dihapus!');
+                    loadData();
+                    loadStats();
+                } else {
+                    showAlert('error', result.message || 'Gagal menghapus data');
+                }
+            } catch (error) {
+                showAlert('error', 'Terjadi kesalahan: ' + error.message);
+            }
+        }
+
+        // Show alert
+        function showAlert(type, message) {
+            const alertId = type === 'success' ? 'successAlert' : 'errorAlert';
+            const alert = document.getElementById(alertId);
+            alert.textContent = message;
+            alert.style.display = 'block';
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleString('id-ID', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+    </script>
 </body>
 </html>

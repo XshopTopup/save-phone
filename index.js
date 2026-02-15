@@ -6,6 +6,11 @@ const { createClient } = require('@libsql/client');
 
 const app = express();
 
+// ⭐ FIX BIGINT SERIALIZATION - Tambahkan ini di paling atas
+BigInt.prototype.toJSON = function() {
+  return this.toString();
+};
+
 // Inisialisasi Turso client
 const client = createClient({
   url: process.env.TURSO_DATABASE_URL,
@@ -43,7 +48,7 @@ app.get('/', (req, res) => {
 
 // ============= CRUD ENDPOINTS =============
 
-// CREATE - Simpan nomor telepon baru (tanpa userId dari user)
+// CREATE - Simpan nomor telepon baru
 app.post('/api/phones', async (req, res) => {
   try {
     const { nomor, negara } = req.body;
@@ -73,23 +78,32 @@ app.post('/api/phones', async (req, res) => {
     });
 
     if (checkResult.rows.length > 0) {
-      return res.status(400).json({ 
+      return res.status(409).json({  // ⭐ Ubah status code ke 409 untuk duplicate
         status: "fail", 
-        message: "Nomor telepon sudah terdaftar" 
+        message: "Nomor telepon sudah terdaftar",
+        data: {
+          phone_number: result.phoneNumber,
+          country_info: checkResult.rows[0].country_info
+        }
       });
     }
 
-    // Simpan ke database (ID auto increment)
+    // Simpan ke database
     const insertResult = await client.execute({
       sql: `INSERT INTO users (phone_number, country_info) VALUES (?, ?)`,
       args: [result.phoneNumber, result.countryIso3]
     });
     
+    // ⭐ Convert BigInt ke String sebelum response
+    const insertedId = insertResult.lastInsertRowid ? 
+      insertResult.lastInsertRowid.toString() : 
+      null;
+    
     return res.status(201).json({
       status: "success",
       message: "Nomor berhasil ditambahkan",
       data: {
-        id: insertResult.lastInsertRowid,
+        id: insertedId,
         phone_number: result.phoneNumber,
         country_info: result.countryIso3
       }
@@ -139,7 +153,7 @@ app.get('/api/phones', async (req, res) => {
     
     return res.status(200).json({ 
       status: "success", 
-      total: total,
+      total: Number(total), // ⭐ Convert BigInt ke Number
       count: result.rows.length,
       data: result.rows 
     });
@@ -184,7 +198,7 @@ app.get('/api/phones/:id', async (req, res) => {
   }
 });
 
-// UPDATE - Update negara saja (nomor tidak bisa diubah)
+// UPDATE - Update negara saja
 app.put('/api/phones/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -304,7 +318,7 @@ app.get('/api/stats', async (req, res) => {
     return res.status(200).json({ 
       status: "success", 
       stats: {
-        total_records: totalResult.rows[0].total,
+        total_records: Number(totalResult.rows[0].total), // ⭐ Convert BigInt
         by_country: countryResult.rows
       }
     });
@@ -318,9 +332,8 @@ app.get('/api/stats', async (req, res) => {
   }
 });
 
-// Backward compatibility dengan endpoint lama
+// Backward compatibility
 app.post('/api/sphone.php', async (req, res) => {
-  // Redirect ke endpoint baru tanpa userId
   const { nomor, negara } = req.body;
   req.body = { nomor, negara };
   req.url = '/api/phones';
@@ -340,11 +353,11 @@ if (process.env.NODE_ENV !== 'production') {
     console.log(`📊 Database API tersedia di:`);
     console.log(`   - GET    /api/phones       - Ambil semua data`);
     console.log(`   - GET    /api/phones/:id   - Ambil data by ID`);
-    console.log(`   - POST   /api/phones       - Tambah data baru (ID otomatis)`);
-    console.log(`   - PUT    /api/phones/:id   - Update negara saja`);
+    console.log(`   - POST   /api/phones       - Tambah data baru`);
+    console.log(`   - PUT    /api/phones/:id   - Update negara`);
     console.log(`   - DELETE /api/phones/:id   - Hapus data`);
-    console.log(`   - DELETE /api/phones       - Hapus semua data`);
-    console.log(`   - GET    /api/stats        - Statistik database`);
+    console.log(`   - DELETE /api/phones       - Hapus semua`);
+    console.log(`   - GET    /api/stats        - Statistik`);
   });
 }
 
